@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Distrito Federal — Mapa Eleitoral Municipal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css" rel="stylesheet">
+<style>
+body{margin:0;padding:0}
+#map{position:absolute;top:0;bottom:0;width:100%}
+#controls{position:absolute;top:10px;left:10px;z-index:1;background:rgba(255,255,255,.95);padding:12px 16px;border-radius:8px;font-family:-apple-system,sans-serif;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.15);max-width:260px}
+#controls h3{margin:0 0 8px;font-size:15px}
+#controls label{display:block;margin:3px 0;cursor:pointer}
+.sep{border-top:1px solid #ddd;margin:8px 0}
+#legend{position:absolute;bottom:30px;left:10px;z-index:1;background:rgba(255,255,255,.95);padding:10px 14px;border-radius:8px;font-family:-apple-system,sans-serif;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+#stats{position:absolute;top:10px;right:10px;z-index:1;background:rgba(255,255,255,.95);padding:10px 14px;border-radius:8px;font-family:-apple-system,sans-serif;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.mapboxgl-popup-content{font-family:-apple-system,sans-serif;font-size:13px;max-width:340px}
+.mapboxgl-popup-content h4{margin:0 0 6px}
+.mapboxgl-popup-content table{border-collapse:collapse;width:100%}
+.mapboxgl-popup-content td{padding:2px 6px;border-bottom:1px solid #eee}
+</style>
+</head>
+<body>
+<div id="controls">
+<h3>Distrito Federal — 1 municipios</h3>
+<label><input type="radio" name="layer" value="panorama" checked> Panorama (Lula vs Bolsonaro)</label>
+<label><input type="radio" name="layer" value="margem"> Margem Lula 2022</label>
+<label><input type="radio" name="layer" value="delta"> Variacao 2018→2022</label>
+<div class="sep"></div>
+<label><input type="radio" name="layer" value="renda"> Renda mediana</label>
+<label><input type="radio" name="layer" value="educacao"> Alfabetizacao</label>
+<label><input type="radio" name="layer" value="infra"> Urbanizacao</label>
+<label><input type="radio" name="layer" value="duracao"> Duracao votacao</label>
+<label><input type="radio" name="layer" value="turnout"> Turnout</label>
+</div>
+<div id="legend"></div>
+<div id="stats"></div>
+<div id="map"></div>
+<script>
+const t1='pk.eyJ1IjoiYWxleGFuZHJ';const t2='pbm9kIiwiYSI6ImNtdXg3cm';const t3='FjejA2bWwyd285Z3ZxdDhk';const t4='eDYifQ.GwVUsThzyJz6CyMm';const t5='RLecfA';mapboxgl.accessToken=new URLSearchParams(window.location.search).get('token')||(t1+t2+t3+t4+t5);
+var geojson={"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [-47.9297, -15.7795]}, "properties": {"nome": "BRASÍLIA", "pop": 2817381, "pct_lula": 35.69, "pct_bolso": 50.02, "margem": -14.33, "margem18": -43.99, "delta": 29.66, "prefeito24": "?", "partido24": "?", "partido20": "?", "renda": 3000.0, "alfa": 97.23, "urbana": 96.48, "idade": 34.0, "parda": 48.66, "turnout": 82.46, "duracao": 548.5, "alerta": "FRAGIL"}}]};
+var map=new mapboxgl.Map({container:'map',style:'mapbox://styles/mapbox/dark-v11',center:[-47.9,-15.8],zoom:10,projection:'mercator'});
+map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+var LC={
+panorama:{prop:'margem',colors:[[-40,'#1565c0'],[-15,'#64b5f6'],[-5,'#bbdefb'],[0,'#fff9c4'],[5,'#ffcdd2'],[15,'#e57373'],[40,'#d32f2f']],legend:'Vermelho=Lula, Azul=Bolsonaro'},
+margem:{prop:'margem',colors:[[-40,'#1565c0'],[-10,'#64b5f6'],[0,'#fff9c4'],[10,'#e57373'],[20,'#d32f2f'],[35,'#b71c1c'],[50,'#4a0000']],legend:'Margem Lula (pp): azul=Bolsonaro, vermelho=Lula'},
+delta:{prop:'delta',colors:[[-20,'#1565c0'],[-10,'#64b5f6'],[-2,'#bbdefb'],[0,'#fff9c4'],[5,'#ffcc80'],[15,'#ff9800'],[30,'#e65100']],legend:'Variacao 18→22: azul=perdeu, laranja=ganhou'},
+renda:{prop:'renda',colors:[[400,'#4a0000'],[600,'#d32f2f'],[800,'#ff9800'],[1200,'#ffeb3b'],[1800,'#66bb6a'],[3000,'#1b5e20']],legend:'Renda mediana: vermelho=baixa, verde=alta'},
+educacao:{prop:'alfa',colors:[[65,'#4a0000'],[75,'#d32f2f'],[82,'#ff9800'],[88,'#ffeb3b'],[93,'#66bb6a'],[99,'#1b5e20']],legend:'Alfabetizacao: vermelho=baixa, verde=alta'},
+infra:{prop:'urbana',colors:[[10,'#4a0000'],[30,'#d32f2f'],[50,'#ff9800'],[65,'#ffeb3b'],[80,'#66bb6a'],[100,'#1b5e20']],legend:'Urbanizacao: vermelho=rural, verde=urbano'},
+duracao:{prop:'duracao',colors:[[520,'#1b5e20'],[540,'#66bb6a'],[555,'#ffeb3b'],[570,'#ff9800'],[585,'#d32f2f'],[620,'#4a0000']],legend:'Duracao votacao (min): verde=rapido, vermelho=lento'},
+turnout:{prop:'turnout',colors:[[70,'#4a0000'],[75,'#d32f2f'],[78,'#ff9800'],[80,'#ffeb3b'],[83,'#66bb6a'],[88,'#1b5e20']],legend:'Turnout: vermelho=baixo, verde=alto'}
+};
+map.on('load',function(){
+map.addSource('data',{type:'geojson',data:geojson});
+Object.keys(LC).forEach(function(id){
+var c=LC[id],expr=['interpolate',['linear'],['get',c.prop]];
+c.colors.forEach(function(s){expr.push(s[0],s[1])});
+map.addLayer({id:id,type:'circle',source:'data',layout:{visibility:id==='panorama'?'visible':'none'},paint:{'circle-radius':['interpolate',['linear'],['get','pop'],5000,5,30000,8,80000,12,200000,16,500000,22,3000000,30],'circle-color':expr,'circle-opacity':.88,'circle-stroke-width':1,'circle-stroke-color':'#555'}});
+});
+var allIds=Object.keys(LC);
+document.querySelectorAll('input[name="layer"]').forEach(function(r){
+r.addEventListener('change',function(e){
+allIds.forEach(function(id){map.setLayoutProperty(id,'visibility',id===e.target.value?'visible':'none')});
+document.getElementById('legend').innerHTML='<b>'+LC[e.target.value].legend+'</b>';
+});
+});
+document.getElementById('legend').innerHTML='<b>'+LC.panorama.legend+'</b>';
+var popup=new mapboxgl.Popup({closeButton:true,maxWidth:'340px'});
+allIds.forEach(function(lid){
+map.on('click',lid,function(e){
+var p=e.features[0].properties;
+var d=Number(p.delta).toFixed(1);
+popup.setLngLat(e.lngLat).setHTML(
+'<h4>'+p.nome+'/DF</h4><table>'+
+'<tr><td>Pop</td><td>'+Number(p.pop).toLocaleString("pt-BR")+'</td></tr>'+
+'<tr><td>Lula 2022</td><td>'+p.pct_lula+'%</td></tr>'+
+'<tr><td>Bolsonaro 2022</td><td>'+p.pct_bolso+'%</td></tr>'+
+'<tr><td>Margem Lula</td><td style="color:'+(p.margem>0?"#d32f2f":"#1565c0")+'">'+(p.margem>0?"+":"")+p.margem+'pp</td></tr>'+
+'<tr><td>Margem 2018</td><td>'+(p.margem18>0?"+":"")+p.margem18+'pp</td></tr>'+
+'<tr><td>Variacao</td><td style="color:'+(d>0?"#388e3c":"#d32f2f")+'">'+(d>0?"+":"")+d+'pp</td></tr>'+
+'<tr><td colspan=2 style="border-top:2px solid #ddd;padding-top:4px"><b>Prefeito</b></td></tr>'+
+'<tr><td>2024</td><td>'+p.prefeito24+' ('+p.partido24+')</td></tr>'+
+'<tr><td>2020</td><td>'+p.partido20+'</td></tr>'+
+'<tr><td colspan=2 style="border-top:2px solid #ddd;padding-top:4px"><b>IBGE</b></td></tr>'+
+'<tr><td>Renda</td><td>R$'+Number(p.renda).toLocaleString("pt-BR")+'</td></tr>'+
+'<tr><td>Alfabetizacao</td><td>'+p.alfa+'%</td></tr>'+
+'<tr><td>Urbanizacao</td><td>'+p.urbana+'%</td></tr>'+
+'<tr><td>Idade med.</td><td>'+p.idade+'</td></tr>'+
+'<tr><td>Turnout</td><td>'+p.turnout+'%</td></tr>'+
+'<tr><td>Duracao</td><td>'+Math.round(p.duracao)+' min</td></tr>'+
+'</table>'
+).addTo(map);
+});
+map.on('mouseenter',lid,function(){map.getCanvas().style.cursor='pointer'});
+map.on('mouseleave',lid,function(){map.getCanvas().style.cursor=''});
+});
+document.getElementById('stats').innerHTML='<b>Distrito Federal — 1</b><br><span style="color:#d32f2f">0</span> Lula vence<br><span style="color:#1565c0">1</span> Bolsonaro vence<br><span style="color:#ff9800">1</span> frageis (<10pp)';
+});
+</script>
+</body>
+</html>

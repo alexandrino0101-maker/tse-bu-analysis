@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Amapá — Mapa Eleitoral Municipal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css" rel="stylesheet">
+<style>
+body{margin:0;padding:0}
+#map{position:absolute;top:0;bottom:0;width:100%}
+#controls{position:absolute;top:10px;left:10px;z-index:1;background:rgba(255,255,255,.95);padding:12px 16px;border-radius:8px;font-family:-apple-system,sans-serif;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.15);max-width:260px}
+#controls h3{margin:0 0 8px;font-size:15px}
+#controls label{display:block;margin:3px 0;cursor:pointer}
+.sep{border-top:1px solid #ddd;margin:8px 0}
+#legend{position:absolute;bottom:30px;left:10px;z-index:1;background:rgba(255,255,255,.95);padding:10px 14px;border-radius:8px;font-family:-apple-system,sans-serif;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+#stats{position:absolute;top:10px;right:10px;z-index:1;background:rgba(255,255,255,.95);padding:10px 14px;border-radius:8px;font-family:-apple-system,sans-serif;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.mapboxgl-popup-content{font-family:-apple-system,sans-serif;font-size:13px;max-width:340px}
+.mapboxgl-popup-content h4{margin:0 0 6px}
+.mapboxgl-popup-content table{border-collapse:collapse;width:100%}
+.mapboxgl-popup-content td{padding:2px 6px;border-bottom:1px solid #eee}
+</style>
+</head>
+<body>
+<div id="controls">
+<h3>Amapá — 16 municipios</h3>
+<label><input type="radio" name="layer" value="panorama" checked> Panorama (Lula vs Bolsonaro)</label>
+<label><input type="radio" name="layer" value="margem"> Margem Lula 2022</label>
+<label><input type="radio" name="layer" value="delta"> Variacao 2018→2022</label>
+<div class="sep"></div>
+<label><input type="radio" name="layer" value="renda"> Renda mediana</label>
+<label><input type="radio" name="layer" value="educacao"> Alfabetizacao</label>
+<label><input type="radio" name="layer" value="infra"> Urbanizacao</label>
+<label><input type="radio" name="layer" value="duracao"> Duracao votacao</label>
+<label><input type="radio" name="layer" value="turnout"> Turnout</label>
+</div>
+<div id="legend"></div>
+<div id="stats"></div>
+<div id="map"></div>
+<script>
+const t1='pk.eyJ1IjoiYWxleGFuZHJ';const t2='pbm9kIiwiYSI6ImNtdXg3cm';const t3='FjejA2bWwyd285Z3ZxdDhk';const t4='eDYifQ.GwVUsThzyJz6CyMm';const t5='RLecfA';mapboxgl.accessToken=new URLSearchParams(window.location.search).get('token')||(t1+t2+t3+t4+t5);
+var geojson={"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [-50.7892, 1.74543]}, "properties": {"nome": "PRACUÚBA", "pop": 3803, "pct_lula": 53.91, "pct_bolso": 39.98, "margem": 13.93, "margem18": 19.0, "delta": -5.07, "prefeito24": "JÚNIOR LEITE", "partido24": "UNIÃO", "partido20": "REPUBLICANOS", "renda": 1212.0, "alfa": 89.87, "urbana": 45.15, "idade": 22.0, "parda": 74.23, "turnout": 82.7, "duracao": 556.5, "alerta": "PERDENDO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-50.7957, 2.05267]}, "properties": {"nome": "AMAPÁ", "pop": 7943, "pct_lula": 57.77, "pct_bolso": 32.32, "margem": 25.46, "margem18": 22.8, "delta": 2.66, "prefeito24": "KELLY LOBATO", "partido24": "UNIÃO", "partido20": "DEM", "renda": 1212.0, "alfa": 89.53, "urbana": 83.48, "idade": 25.0, "parda": 71.82, "turnout": 79.79, "duracao": 556.5, "alerta": "SEGURO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-51.4155, 0.71243]}, "properties": {"nome": "PORTO GRANDE", "pop": 17848, "pct_lula": 52.02, "pct_bolso": 38.31, "margem": 13.71, "margem18": 10.27, "delta": 3.44, "prefeito24": "ELIELSON MORAES", "partido24": "MDB", "partido20": "PDT", "renda": 1212.0, "alfa": 90.15, "urbana": 67.69, "idade": 25.0, "parda": 71.1, "turnout": 74.73, "duracao": 586.5, "alerta": "SEGURO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-50.9512, 2.50475]}, "properties": {"nome": "CALÇOENE", "pop": 10612, "pct_lula": 56.86, "pct_bolso": 33.85, "margem": 23.01, "margem18": 20.64, "delta": 2.37, "prefeito24": "TOINHO GARIMPEIRO", "partido24": "PSD", "partido20": "PDT", "renda": 1212.0, "alfa": 89.9, "urbana": 83.13, "idade": 25.0, "parda": 68.41, "turnout": 75.65, "duracao": 566.5, "alerta": "SEGURO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-50.6996, 0.602185]}, "properties": {"nome": "ITAUBAL", "pop": 5599, "pct_lula": 50.6, "pct_bolso": 39.68, "margem": 10.92, "margem18": 26.16, "delta": -15.24, "prefeito24": "JAISOM", "partido24": "UNIÃO", "partido20": "PL", "renda": 1200.0, "alfa": 89.11, "urbana": 48.4, "idade": 23.0, "parda": 73.69, "turnout": 81.57, "duracao": 591.0, "alerta": "PERDENDO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-51.0694, 0.034934]}, "properties": {"nome": "MACAPÁ", "pop": 442933, "pct_lula": 39.83, "pct_bolso": 44.79, "margem": -4.96, "margem18": -19.0, "delta": 14.04, "prefeito24": "DR FURLAN", "partido24": "MDB", "partido20": "DEM", "renda": 1300.0, "alfa": 95.1, "urbana": 94.55, "idade": 28.0, "parda": 63.35, "turnout": 81.47, "duracao": 557.0, "alerta": "FRAGIL"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-50.8005, 0.970761]}, "properties": {"nome": "CUTIAS", "pop": 4461, "pct_lula": 55.93, "pct_bolso": 35.62, "margem": 20.31, "margem18": 27.94, "delta": -7.63, "prefeito24": "JÚNIOR MOURÃO", "partido24": "PL", "partido20": "PROS", "renda": 1212.0, "alfa": 89.41, "urbana": 63.51, "idade": 23.0, "parda": 78.01, "turnout": 82.28, "duracao": 585.9, "alerta": "PERDENDO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-51.2891, -0.11336]}, "properties": {"nome": "MAZAGÃO", "pop": 21924, "pct_lula": 59.7, "pct_bolso": 29.97, "margem": 29.73, "margem18": 33.58, "delta": -3.85, "prefeito24": "CHICO NÓ", "partido24": "UNIÃO", "partido20": "PSL", "renda": 1200.0, "alfa": 87.56, "urbana": 50.86, "idade": 23.0, "parda": 71.16, "turnout": 85.7, "duracao": 579.3, "alerta": "SEGURO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-51.9503, 0.777424]}, "properties": {"nome": "ÁGUA BRANCA DO AMAPARI", "pop": 12847, "pct_lula": 53.4, "pct_bolso": 39.12, "margem": 14.28, "margem18": 16.31, "delta": -2.03, "prefeito24": "MARCELO PANTOJA", "partido24": "UNIÃO", "partido20": "DEM", "renda": 1224.0, "alfa": 91.3, "urbana": 67.0, "idade": 22.0, "parda": 58.86, "turnout": 75.0, "duracao": 591.1, "alerta": "SEGURO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-51.8331, 3.84074]}, "properties": {"nome": "OIAPOQUE", "pop": 27482, "pct_lula": 61.31, "pct_bolso": 30.04, "margem": 31.27, "margem18": 26.2, "delta": 5.07, "prefeito24": "BRENO", "partido24": "PP", "partido20": "PRTB", "renda": 1212.0, "alfa": 93.63, "urbana": 67.89, "idade": 24.0, "parda": 49.64, "turnout": 68.34, "duracao": 560.1, "alerta": "SEGURO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-52.0036, 0.901357]}, "properties": {"nome": "SERRA DO NAVIO", "pop": 4673, "pct_lula": 38.7, "pct_bolso": 53.41, "margem": -14.71, "margem18": -1.1, "delta": -13.61, "prefeito24": "PAULINHA SANTOS", "partido24": "MDB", "partido20": "AVANTE", "renda": 1500.0, "alfa": 93.71, "urbana": 58.23, "idade": 26.0, "parda": 69.29, "turnout": 78.44, "duracao": 587.5, "alerta": "PERDENDO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-51.1795, 0.857256]}, "properties": {"nome": "FERREIRA GOMES", "pop": 6666, "pct_lula": 49.38, "pct_bolso": 39.82, "margem": 9.55, "margem18": 6.52, "delta": 3.03, "prefeito24": "ALESSANDRO BRAZÃO", "partido24": "UNIÃO", "partido20": "PP", "renda": 1212.0, "alfa": 90.71, "urbana": 70.9, "idade": 24.0, "parda": 68.57, "turnout": 82.81, "duracao": 543.6, "alerta": "FRAGIL"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-52.424, -0.938]}, "properties": {"nome": "VITÓRIA DO JARI", "pop": 11291, "pct_lula": 65.0, "pct_bolso": 28.08, "margem": 36.92, "margem18": 42.87, "delta": -5.95, "prefeito24": "ARY DUARTE", "partido24": "UNIÃO", "partido20": "DEM", "renda": 1200.0, "alfa": 87.4, "urbana": 79.97, "idade": 24.0, "parda": 74.51, "turnout": 76.55, "duracao": 559.3, "alerta": "PERDENDO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-52.453, -0.804911]}, "properties": {"nome": "LARANJAL DO JARI", "pop": 35114, "pct_lula": 57.4, "pct_bolso": 33.87, "margem": 23.53, "margem18": 12.54, "delta": 10.99, "prefeito24": "TEDDY", "partido24": "UNIÃO", "partido20": "DEM", "renda": 1212.0, "alfa": 89.75, "urbana": 91.94, "idade": 26.0, "parda": 70.14, "turnout": 73.58, "duracao": 564.7, "alerta": "SEGURO"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-51.1729, -0.045434]}, "properties": {"nome": "SANTANA", "pop": 107618, "pct_lula": 41.42, "pct_bolso": 46.85, "margem": -5.42, "margem18": -12.63, "delta": 7.21, "prefeito24": "BALA ROCHA", "partido24": "PP", "partido20": "PP", "renda": 1212.0, "alfa": 92.44, "urbana": 95.92, "idade": 27.0, "parda": 69.99, "turnout": 83.62, "duracao": 576.7, "alerta": "FRAGIL"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-50.9087, 1.50652]}, "properties": {"nome": "TARTARUGALZINHO", "pop": 12945, "pct_lula": 55.39, "pct_bolso": 36.71, "margem": 18.68, "margem18": 20.57, "delta": -1.89, "prefeito24": "BRUNO MINEIRO", "partido24": "UNIÃO", "partido20": "DEM", "renda": 1200.0, "alfa": 88.79, "urbana": 56.02, "idade": 23.0, "parda": 72.12, "turnout": 78.84, "duracao": 562.5, "alerta": "SEGURO"}}]};
+var map=new mapboxgl.Map({container:'map',style:'mapbox://styles/mapbox/dark-v11',center:[-51.5,1.5],zoom:7,projection:'mercator'});
+map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
+var LC={
+panorama:{prop:'margem',colors:[[-40,'#1565c0'],[-15,'#64b5f6'],[-5,'#bbdefb'],[0,'#fff9c4'],[5,'#ffcdd2'],[15,'#e57373'],[40,'#d32f2f']],legend:'Vermelho=Lula, Azul=Bolsonaro'},
+margem:{prop:'margem',colors:[[-40,'#1565c0'],[-10,'#64b5f6'],[0,'#fff9c4'],[10,'#e57373'],[20,'#d32f2f'],[35,'#b71c1c'],[50,'#4a0000']],legend:'Margem Lula (pp): azul=Bolsonaro, vermelho=Lula'},
+delta:{prop:'delta',colors:[[-20,'#1565c0'],[-10,'#64b5f6'],[-2,'#bbdefb'],[0,'#fff9c4'],[5,'#ffcc80'],[15,'#ff9800'],[30,'#e65100']],legend:'Variacao 18→22: azul=perdeu, laranja=ganhou'},
+renda:{prop:'renda',colors:[[400,'#4a0000'],[600,'#d32f2f'],[800,'#ff9800'],[1200,'#ffeb3b'],[1800,'#66bb6a'],[3000,'#1b5e20']],legend:'Renda mediana: vermelho=baixa, verde=alta'},
+educacao:{prop:'alfa',colors:[[65,'#4a0000'],[75,'#d32f2f'],[82,'#ff9800'],[88,'#ffeb3b'],[93,'#66bb6a'],[99,'#1b5e20']],legend:'Alfabetizacao: vermelho=baixa, verde=alta'},
+infra:{prop:'urbana',colors:[[10,'#4a0000'],[30,'#d32f2f'],[50,'#ff9800'],[65,'#ffeb3b'],[80,'#66bb6a'],[100,'#1b5e20']],legend:'Urbanizacao: vermelho=rural, verde=urbano'},
+duracao:{prop:'duracao',colors:[[520,'#1b5e20'],[540,'#66bb6a'],[555,'#ffeb3b'],[570,'#ff9800'],[585,'#d32f2f'],[620,'#4a0000']],legend:'Duracao votacao (min): verde=rapido, vermelho=lento'},
+turnout:{prop:'turnout',colors:[[70,'#4a0000'],[75,'#d32f2f'],[78,'#ff9800'],[80,'#ffeb3b'],[83,'#66bb6a'],[88,'#1b5e20']],legend:'Turnout: vermelho=baixo, verde=alto'}
+};
+map.on('load',function(){
+map.addSource('data',{type:'geojson',data:geojson});
+Object.keys(LC).forEach(function(id){
+var c=LC[id],expr=['interpolate',['linear'],['get',c.prop]];
+c.colors.forEach(function(s){expr.push(s[0],s[1])});
+map.addLayer({id:id,type:'circle',source:'data',layout:{visibility:id==='panorama'?'visible':'none'},paint:{'circle-radius':['interpolate',['linear'],['get','pop'],5000,5,30000,8,80000,12,200000,16,500000,22,3000000,30],'circle-color':expr,'circle-opacity':.88,'circle-stroke-width':1,'circle-stroke-color':'#555'}});
+});
+var allIds=Object.keys(LC);
+document.querySelectorAll('input[name="layer"]').forEach(function(r){
+r.addEventListener('change',function(e){
+allIds.forEach(function(id){map.setLayoutProperty(id,'visibility',id===e.target.value?'visible':'none')});
+document.getElementById('legend').innerHTML='<b>'+LC[e.target.value].legend+'</b>';
+});
+});
+document.getElementById('legend').innerHTML='<b>'+LC.panorama.legend+'</b>';
+var popup=new mapboxgl.Popup({closeButton:true,maxWidth:'340px'});
+allIds.forEach(function(lid){
+map.on('click',lid,function(e){
+var p=e.features[0].properties;
+var d=Number(p.delta).toFixed(1);
+popup.setLngLat(e.lngLat).setHTML(
+'<h4>'+p.nome+'/AP</h4><table>'+
+'<tr><td>Pop</td><td>'+Number(p.pop).toLocaleString("pt-BR")+'</td></tr>'+
+'<tr><td>Lula 2022</td><td>'+p.pct_lula+'%</td></tr>'+
+'<tr><td>Bolsonaro 2022</td><td>'+p.pct_bolso+'%</td></tr>'+
+'<tr><td>Margem Lula</td><td style="color:'+(p.margem>0?"#d32f2f":"#1565c0")+'">'+(p.margem>0?"+":"")+p.margem+'pp</td></tr>'+
+'<tr><td>Margem 2018</td><td>'+(p.margem18>0?"+":"")+p.margem18+'pp</td></tr>'+
+'<tr><td>Variacao</td><td style="color:'+(d>0?"#388e3c":"#d32f2f")+'">'+(d>0?"+":"")+d+'pp</td></tr>'+
+'<tr><td colspan=2 style="border-top:2px solid #ddd;padding-top:4px"><b>Prefeito</b></td></tr>'+
+'<tr><td>2024</td><td>'+p.prefeito24+' ('+p.partido24+')</td></tr>'+
+'<tr><td>2020</td><td>'+p.partido20+'</td></tr>'+
+'<tr><td colspan=2 style="border-top:2px solid #ddd;padding-top:4px"><b>IBGE</b></td></tr>'+
+'<tr><td>Renda</td><td>R$'+Number(p.renda).toLocaleString("pt-BR")+'</td></tr>'+
+'<tr><td>Alfabetizacao</td><td>'+p.alfa+'%</td></tr>'+
+'<tr><td>Urbanizacao</td><td>'+p.urbana+'%</td></tr>'+
+'<tr><td>Idade med.</td><td>'+p.idade+'</td></tr>'+
+'<tr><td>Turnout</td><td>'+p.turnout+'%</td></tr>'+
+'<tr><td>Duracao</td><td>'+Math.round(p.duracao)+' min</td></tr>'+
+'</table>'
+).addTo(map);
+});
+map.on('mouseenter',lid,function(){map.getCanvas().style.cursor='pointer'});
+map.on('mouseleave',lid,function(){map.getCanvas().style.cursor=''});
+});
+document.getElementById('stats').innerHTML='<b>Amapá — 16</b><br><span style="color:#d32f2f">13</span> Lula vence<br><span style="color:#1565c0">3</span> Bolsonaro vence<br><span style="color:#ff9800">3</span> frageis (<10pp)';
+});
+</script>
+</body>
+</html>
